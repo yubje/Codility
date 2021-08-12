@@ -1,7 +1,6 @@
 # Learning
 
 
-
 ## Lesson 1 Iterations
 
 ### 1. [Painless] [BinaryGap](https://app.codility.com/programmers/lessons/1-iterations/binary_gap/)
@@ -377,11 +376,38 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 ### 2. [Respectable] [MaxCounters](https://app.codility.com/programmers/lessons/4-counting_elements/max_counters/)
 
+#### Timeout Solution
+
+```python
+def solution(N, A):
+    count = [0]*N
+    for i in range(len(A)):
+        if 1 <= A[i]<= N:
+            count[A[i]-1] += 1
+        else:
+            count = [max(count)]*N
+    return count
+```
+
 
 
 ### 3. [Respectable] [MissingInteger](https://app.codility.com/programmers/lessons/4-counting_elements/missing_integer/)
 
 
+
+#### Solution
+
+> https://app.codility.com/demo/results/training5PGQY7-282/
+
+```python
+def solution(A):
+    A.sort()
+    min_num = 1
+    for a in A:
+        if a == min_num:
+            min_num += 1
+    return min_num
+```
 
 ### 4. [Painless] [PermCheck](https://app.codility.com/programmers/lessons/4-counting_elements/perm_check/)
 
@@ -1147,7 +1173,121 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 
 
-## Lesson 9 
+## Lesson 9 Maximum Slice Problem
+### 2. [Painless] [MaxProfit](https://app.codility.com/programmers/lessons/9-maximum_slice_problem/max_profit/)
+
+An array A consisting of N integers is given. It contains daily prices of a stock share for a period of N consecutive days. If a single share was bought on day P and sold on day Q, where 0 ≤ P ≤ Q < N, then the *profit* of such transaction is equal to A[Q] − A[P], provided that A[Q] ≥ A[P]. Otherwise, the transaction brings *loss* of A[P] − A[Q].
+
+For example, consider the following array A consisting of six elements such that:
+
+```
+  A[0] = 23171  A[1] = 21011  A[2] = 21123  A[3] = 21366  A[4] = 21013  A[5] = 21367
+```
+
+If a share was bought on day 0 and sold on day 2, a loss of 2048 would occur because A[2] − A[0] = 21123 − 23171 = −2048. If a share was bought on day 4 and sold on day 5, a profit of 354 would occur because A[5] − A[4] = 21367 − 21013 = 354. Maximum possible profit was 356. It would occur if a share was bought on day 1 and sold on day 5.
+
+Write a function,
+
+> ```
+> def solution(A)
+> ```
+
+that, given an array A consisting of N integers containing daily prices of a stock share for a period of N consecutive days, returns the maximum possible profit from one transaction during this period. The function should return 0 if it was impossible to gain any profit.
+
+For example, given array A consisting of six elements such that:
+
+```
+  A[0] = 23171  A[1] = 21011  A[2] = 21123  A[3] = 21366  A[4] = 21013  A[5] = 21367
+```
+
+the function should return 356, as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [0..400,000];
+> - each element of array A is an integer within the range [0..200,000].
+
+#### Summary
+
+* 시작 인덱스와 끝 인덱싀의 값 차이를 비교하여 그 중 최댓값 구함 |A[i]-A[j]|
+
+#### Solution
+
+>  https://app.codility.com/demo/results/trainingF7VPGV-UNR/
+
+```python
+
+def solution(A):
+    if len(A) < 2:    # 예외처리 안하면 정답률 88%
+        return 0
+    min_price = A[0]
+    max_profit = 0
+    for price in A:
+        profit = price - min_price
+        if profit > max_profit:
+            max_profit = profit
+        if min_price > price:
+            min_price = price 
+    return max_profit
+```
+
+
+
+### 3. [Painless] [MaxSliceSum](https://app.codility.com/programmers/lessons/9-maximum_slice_problem/max_slice_sum/)
+
+A non-empty array A consisting of N integers is given. A pair of integers (P, Q), such that 0 ≤ P ≤ Q < N, is called a *slice* of array A. The *sum* of a slice (P, Q) is the total of A[P] + A[P+1] + ... + A[Q].
+
+Write a function:
+
+> ```
+> def solution(A)
+> ```
+
+that, given an array A consisting of N integers, returns the maximum sum of any slice of A.
+
+For example, given array A such that:
+
+```
+A[0] = 3  A[1] = 2  A[2] = -6 A[3] = 4  A[4] = 0
+```
+
+the function should return 5 because:
+
+> - (3, 4) is a slice of A that has sum 4,
+> - (2, 2) is a slice of A that has sum −6,
+> - (0, 1) is a slice of A that has sum 5,
+> - no other slice of A has sum greater than (0, 1).
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [1..1,000,000];
+> - each element of array A is an integer within the range [−1,000,000..1,000,000];
+> - the result will be an integer within the range [−2,147,483,648..2,147,483,647].
+
+#### Summary
+
+* 특정 범위의 숫자들의 합 중 최댓값 찾기
+
+#### Solution
+
+> https://app.codility.com/demo/results/trainingVZA4GW-4YX/
+
+
+
+```python
+def solution(A):
+    if len(A) == 1: return A[0]   # 없어도 OK
+    max_sum = sum(A)  # 합들 중 최댓값 
+    current = 0       # 현재 합
+    for num in A:
+        max_sum = max(max_sum, current+num)  # 현재 더해질 값과, 최대합 중 더 큰 값으로 업데이트 
+        current = max(0, current+num)        # 새로운 값이 더해졌을 떼 0보다 크면 업데이트, 아니면 0부터 다시 확인 
+    return max_sum
+```
+
+
+
+
 
 
 
