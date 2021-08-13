@@ -1174,6 +1174,73 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 
 ## Lesson 9 Maximum Slice Problem
+
+### 1. [Respectable] 
+
+A non-empty array A consisting of N integers is given.
+
+A triplet (X, Y, Z), such that 0 ≤ X < Y < Z < N, is called a *double slice*.
+
+The *sum* of double slice (X, Y, Z) is the total of A[X + 1] + A[X + 2] + ... + A[Y − 1] + A[Y + 1] + A[Y + 2] + ... + A[Z − 1].
+
+For example, array A such that:
+
+```
+    A[0] = 3    A[1] = 2    A[2] = 6    A[3] = -1    A[4] = 4    A[5] = 5    A[6] = -1    A[7] = 2
+```
+
+contains the following example double slices:
+
+> - double slice (0, 3, 6), sum is 2 + 6 + 4 + 5 = 17,
+> - double slice (0, 3, 7), sum is 2 + 6 + 4 + 5 − 1 = 16,
+> - double slice (3, 4, 5), sum is 0.
+
+The goal is to find the maximal sum of any double slice.
+
+Write a function:
+
+> ```
+> def solution(A)
+> ```
+
+that, given a non-empty array A consisting of N integers, returns the maximal sum of any double slice.
+
+For example, given:
+
+```
+    A[0] = 3    A[1] = 2    A[2] = 6    A[3] = -1    A[4] = 4    A[5] = 5    A[6] = -1    A[7] = 2
+```
+
+the function should return 17, because no double slice of array A has a sum of greater than 17.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [3..100,000];
+> - each element of array A is an integer within the range [−10,000..10,000].
+
+#### Solution
+
+> https://app.codility.com/demo/results/trainingU8VH76-357/
+
+```python
+def solution(A):
+    N = len(A)
+    left = [0]*N
+    right = [0]*N
+    for i in range(1, N-1):
+        left[i] = max(0, left[i-1]+A[i])
+    for i in range(N-2, 0, -1):
+        right[i] = max(0, right[i+1]+A[i])
+    
+    max_sum = 0
+    for i in range(1, N-1):
+        max_sum = max(max_sum, left[i-1]+right[i+1])
+    return max_sum
+
+```
+
+
+
 ### 2. [Painless] [MaxProfit](https://app.codility.com/programmers/lessons/9-maximum_slice_problem/max_profit/)
 
 An array A consisting of N integers is given. It contains daily prices of a stock share for a period of N consecutive days. If a single share was bought on day P and sold on day Q, where 0 ≤ P ≤ Q < N, then the *profit* of such transaction is equal to A[Q] − A[P], provided that A[Q] ≥ A[P]. Otherwise, the transaction brings *loss* of A[P] − A[Q].
@@ -1325,15 +1392,177 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 
 
-## Lesson 11
+## Lesson 11 Sieve of Eratosthenes
+
+### 1. [Respectable] [CountNonDivisible](https://app.codility.com/programmers/lessons/11-sieve_of_eratosthenes/count_non_divisible/)
+
+You are given an array A consisting of N integers.
+
+For each number A[i] such that 0 ≤ i < N, we want to count the number of elements of the array that are not the divisors of A[i]. We say that these elements are non-divisors.
+
+For example, consider integer N = 5 and array A such that:
+
+```
+    A[0] = 3    A[1] = 1    A[2] = 2    A[3] = 3    A[4] = 6
+```
+
+For the following elements:
+
+> - A[0] = 3, the non-divisors are: 2, 6,
+> - A[1] = 1, the non-divisors are: 3, 2, 3, 6,
+> - A[2] = 2, the non-divisors are: 3, 3, 6,
+> - A[3] = 3, the non-divisors are: 2, 6,
+> - A[4] = 6, there aren't any non-divisors.
+
+Write a function:
+
+> ```
+> def solution(A)
+> ```
+
+that, given an array A consisting of N integers, returns a sequence of integers representing the amount of non-divisors.
+
+Result array should be returned as an array of integers.
+
+For example, given:
+
+```
+    A[0] = 3    A[1] = 1    A[2] = 2    A[3] = 3    A[4] = 6
+```
+
+the function should return [2, 4, 3, 2, 0], as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [1..50,000];
+> - each element of array A is an integer within the range [1..2 * N].
+
+#### Summary
+
+* 배열의 원소를 나눌 수 있는 약수가 배열의 다른 원소들 중에 얼마나 있는지 확인하여, 해당 원소의 약수가 아닌 수의 개수를 리턴
+
+#### Solution
+
+> https://app.codility.com/demo/results/trainingVG6UNM-Y4X/
+
+```python
+def solution(A):
+    N = len(A)
+    
+    # 배열 A의 원소갯수를 담을 list, index가 원소가 됨
+    element = [0]*(2*N+1)
+    
+    # 배열 A에서 각 원소갯수를 카운트 / count 함수 쓰면 시간초과 남
+    for a in A:
+        element[a] += 1
+        
+    ans = [0]*N
+    # A를 for문돌다가 이전에 확인했던 값과 똑같은 요소인 경우 저장해서 바로 사용하기 위함
+    checked = [-1] * (2*N+1)   
+    
+    for i in range(N):
+        current = A[i]
+        
+        # 이전에 똑같은 원소가 나온 경우 이전에 계산한 값 그대로 씀 
+        if checked[current] != -1:
+            ans[i] = checked[current]
+        else :
+            divisor = 0
+            for j in range(1, int(current**0.5) + 1):
+                # 현재 원소의 약수를 구하기 위하며, 만약 6인 경우 1,2,3,6이니 2까지만 for문을 돌고 3은 동시에 카운트
+                # 만약 6인 경우 6의 제곱근까지만 확인하면 약수의 개수 확인 가능 
+                if current%j == 0:  
+                    divisor += element[j] 
+                    
+                    # current가 4인경우 j가 2인 상황을 위함. 1,2,3,6일 때 2와 3처럼 대칭인 부분이 없기때문
+                    if j != current//j:
+                        divisor += element[current//j]   # 제곱근이 정수가 아닌 경우 해당 약수로 나누어지는 나머지 값 더함 
+            
+            # 약수를 구한 후 전체 값에서 빼면, 원하는 답이 나옴
+            ans[i] = N - divisor
+            # 원소를 저장했다가 중복되는 경우 똑같은 값으로 사용하기 위함
+            checked[current] = ans[i]
+    return ans
+```
+
+#### Timeout Solution
+
+> https://app.codility.com/demo/results/trainingPQPVVF-22P/
+
+```python
+# 정답률 55%
+def solution(A):
+    ans = [0]*len(A)
+    for i in range(len(A)):
+        for b in A:
+            if b <= A[i] and not A[i] % b:
+                continue
+            ans[i] += 1    
+    return ans
+```
+
+#### 
+
+## Lesson 12 Euclidean algorithm
+
+### 1. [Painless] [ChocolatesByNumbers](https://app.codility.com/programmers/lessons/12-euclidean_algorithm/chocolates_by_numbers/)
+
+Two positive integers N and M are given. Integer N represents the number of chocolates arranged in a circle, numbered from 0 to N − 1.
+
+You start to eat the chocolates. After eating a chocolate you leave only a wrapper.
+
+You begin with eating chocolate number 0. Then you omit the next M − 1 chocolates or wrappers on the circle, and eat the following one.
+
+More precisely, if you ate chocolate number X, then you will next eat the chocolate with number (X + M) modulo N (remainder of division).
+
+You stop eating when you encounter an empty wrapper.
+
+For example, given integers N = 10 and M = 4. You will eat the following chocolates: 0, 4, 8, 2, 6.
+
+The goal is to count the number of chocolates that you will eat, following the above rules.
+
+Write a function:
+
+> ```
+> def solution(N, M)
+> ```
+
+that, given two positive integers N and M, returns the number of chocolates that you will eat.
+
+For example, given integers N = 10 and M = 4. the function should return 5, as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N and M are integers within the range [1..1,000,000,000].
+
+#### Summary
+
+* 최대공약수 (Greatest Common Divisor 구하기)
+
+> 192 = 72 * 2 **+ 48** //192를 72로 나누어 나머지를 구한다.
+> 72 = 48 * 1 **+ 24** //72를 위 연산의 나머지인 48로 나눈다.
+> 48 = 24 * 2 // 48을 위 연산의 나머지인 2로 나누었더니 **나머지가 0**이다.
+>
+> 따라서, 나머지가 0이 되기전 연산의 나머지인 24가 두 수 의 최대 공약수라고 할 수 있다.
+
+#### Solution
+
+> https://app.codility.com/demo/results/trainingUGA3H2-VN2/
+
+```python
+def solution(N, M):
+    if N == 1: return 1
+
+    def gcd(n, m):
+        if not m: return n    # 나머지가 없으면 가장 마지막으로 나눈 factor(약수) 반환 
+        return gcd(m, n%m)    # 나누는 수 , 나머지
+    
+    return int(N/gcd(N, M)) # 최대공약수 수로 나눈다.
+```
 
 
 
-## Lesson 12
-
-
-
-## Lesson 13
+## Lesson 13 Fibonacci numbers
 
 
 
@@ -1341,7 +1570,191 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 
 
-## Lesson 15
+## Lesson 15 Caterpillar method
+
+### 1. [Painless] [AbsDistinct](https://app.codility.com/programmers/lessons/15-caterpillar_method/abs_distinct/)
+
+A non-empty array A consisting of N numbers is given. The array is sorted in non-decreasing order. The *absolute distinct count* of this array is the number of distinct absolute values among the elements of the array.
+
+For example, consider array A such that:
+
+```
+  A[0] = -5  A[1] = -3  A[2] = -1  A[3] =  0  A[4] =  3  A[5] =  6
+```
+
+The absolute distinct count of this array is 5, because there are 5 distinct absolute values among the elements of this array, namely 0, 1, 3, 5 and 6.
+
+Write a function:
+
+> ```
+> def solution(A)
+> ```
+
+that, given a non-empty array A consisting of N numbers, returns absolute distinct count of array A.
+
+For example, given array A such that:
+
+```
+  A[0] = -5  A[1] = -3  A[2] = -1  A[3] =  0  A[4] =  3  A[5] =  6
+```
+
+the function should return 5, as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [1..100,000];
+> - each element of array A is an integer within the range [−2,147,483,648..2,147,483,647];
+> - array A is sorted in non-decreasing order.
+
+#### Summary
+
+* 리스트 값들의 절댓값을 구하여 숫자 가짓수 반환
+
+#### Solution
+
+>https://app.codility.com/demo/results/trainingDEGZYM-Q9Y/
+
+```python
+def solution(A):
+    A = [abs(a) for a in A]
+    return len(set(A))
+```
+
+
+
+### 2. [Painless] [CountDistinctSlices](https://app.codility.com/programmers/lessons/15-caterpillar_method/count_distinct_slices/)
+
+An integer M and a non-empty array A consisting of N non-negative integers are given. All integers in array A are less than or equal to M.
+
+A pair of integers (P, Q), such that 0 ≤ P ≤ Q < N, is called a *slice* of array A. The slice consists of the elements A[P], A[P + 1], ..., A[Q]. A *distinct slice* is a slice consisting of only unique numbers. That is, no individual number occurs more than once in the slice.
+
+For example, consider integer M = 6 and array A such that:
+
+```
+    A[0] = 3    A[1] = 4    A[2] = 5    A[3] = 5    A[4] = 2
+```
+
+There are exactly nine distinct slices: (0, 0), (0, 1), (0, 2), (1, 1), (1, 2), (2, 2), (3, 3), (3, 4) and (4, 4).
+
+The goal is to calculate the number of distinct slices.
+
+Write a function:
+
+> ```
+> def solution(M, A)
+> ```
+
+that, given an integer M and a non-empty array A consisting of N integers, returns the number of distinct slices.
+
+If the number of distinct slices is greater than 1,000,000,000, the function should return 1,000,000,000.
+
+For example, given integer M = 6 and array A such that:
+
+```
+    A[0] = 3    A[1] = 4    A[2] = 5    A[3] = 5    A[4] = 2
+```
+
+the function should return 9, as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [1..100,000];
+> - M is an integer within the range [0..100,000];
+> - each element of array A is an integer within the range [0..M].
+
+#### Solution
+
+> https://app.codility.com/demo/results/trainingY45UUH-4QW/
+
+```python
+def solution(M, A):
+    n = len(A)
+    back, slices = 0, 0
+    used = [0]*(M+1)    # 방문 여부를 기록한다
+    for front in range(n):
+        while back < n and not used[A[back]]:
+            used[A[back]] += 1
+            slices += back - front +1 
+            back += 1
+        used[A[front]] -= 1
+        if slices >= 10**9:
+            return 10**9
+    return slices
+
+```
+
+#### Wrong Solution
+
+```python
+ # 틀린 풀이
+def solution(M, A):
+    slice_cnt = 0
+    nums = [A[0]]
+    for i in range(1, len(A)):
+        print(nums, slice_cnt, nums)
+        if A[i] in nums:
+            nums=[A[i]]
+        else:
+            slice_cnt += len(nums)
+            nums.append(A[i])  
+    return slice_cnt+len(A)
+```
+
+
+
+### 3. [Painless] 
+
+An array A consisting of N integers is given. A triplet (P, Q, R) is *triangular* if it is possible to build a triangle with sides of lengths A[P], A[Q] and A[R]. In other words, triplet (P, Q, R) is triangular if 0 ≤ P < Q < R < N and:
+
+> - A[P] + A[Q] > A[R],
+> - A[Q] + A[R] > A[P],
+> - A[R] + A[P] > A[Q].
+
+For example, consider array A such that:
+
+```
+  A[0] = 10    A[1] = 2    A[2] = 5  A[3] = 1     A[4] = 8    A[5] = 12
+```
+
+There are four triangular triplets that can be constructed from elements of this array, namely (0, 2, 4), (0, 2, 5), (0, 4, 5), and (2, 4, 5).
+
+Write a function:
+
+> ```
+> def solution(A)
+> ```
+
+that, given an array A consisting of N integers, returns the number of triangular triplets in this array.
+
+For example, given array A such that:
+
+```
+  A[0] = 10    A[1] = 2    A[2] = 5  A[3] = 1     A[4] = 8    A[5] = 12
+```
+
+the function should return 4, as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [0..1,000];
+> - each element of array A is an integer within the range [1..1,000,000,000].
+
+#### Solution
+```python
+#  66%
+def solution(A):
+    result = 0
+    A.sort()
+    for x in range(len(A)-2):
+        for y in range(x+1, len(A)-1):
+            z = y+1
+            cnt = 0
+            while y < z < len(A) and A[x]+A[y]>A[z]:
+                z += 1
+                cnt += 1
+            result += cnt
+    return result
+```
 
 
 
@@ -1445,7 +1858,7 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 #### Solution
 
-```python
+​```python
 
 ```
 
