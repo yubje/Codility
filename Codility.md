@@ -23,7 +23,12 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 > - N is an integer within the range [1..2,147,483,647].
 
+#### Summary
 
+* 숫자를 이진수로 변환
+* 이진수에서 1000...1 으로 되어 있는 형태 찾기
+* 1로 둘러싸여 있는 0의 갯수 확인하여 그 중 최댓값 반환 
+* Key : 값이 1인 인덱스를 저장하여 계산한다. 
 
 #### Solution
 
@@ -31,13 +36,13 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 ````python
 def solution(N):
-    num = str(format(N, "b"))
-    ones =[]
+    num = str(format(N, "b"))   # 이진수로 변환 
+    ones =[]                    # 값이 1인 것들의 인덱스 저장 
     for i, val in enumerate(num):
         if val == '1':
             ones.append(i)
-    max_diff = 0
-    for j in range(len(ones)-1):
+    max_diff = 0                # 1의 인덱스 간 차이 중 최댓값 (0의 개수 최댓값)
+    for j in range(len(ones)-1):    #  1의 인덱스 확인 
         if ones[j+1] - ones[j]-1 > max_diff:
             max_diff = ones[j+1] - ones[j]-1
     return max_diff
@@ -98,10 +103,25 @@ Assume that:
 
 In your solution, focus on ***\*correctness\****. The performance of your solution will not be the focus of the assessment.
 
+#### Summary
+
+* given an array A consisting of N integers and an integer K, returns the array A rotated K times.
+* 숫자 회전
+* 배열의 개수와 밀리는 개수 간 약수/배수 관계 활용
+
 #### Solution
 
 ```python
-
+def solution(A, K):
+    N = len(A)
+    
+    if N<2:
+        return A
+     
+    if K>=N:
+        K = K%N       
+        
+    return A[N-K:]+A[:N-K]
 ```
 
 
@@ -143,7 +163,9 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 > - each element of array A is an integer within the range [1..1,000,000,000];
 > - all but one of the values in A occur an even number of times.
 
+#### Summary
 
+* 배열에 홀수회 존재하는 숫자 찾기 
 
 #### Solution
 
@@ -152,8 +174,8 @@ def solution(A):
     N = len(A)
     if N ==1:
         return A[0]
-    A.sort()
-    for i in range(0, len(A), 2):
+    A.sort()                        # sort를 먼저 하다
+    for i in range(0, len(A), 2):   # 2개씩 확인하면 두 값이 다를 때 홀수개인 숫자인 것 
         if i+1 == len(A):
             return A[i]
         if A[i] != A[i+1]:
@@ -217,6 +239,18 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 > - X, Y and D are integers within the range [1..1,000,000,000];
 > - X ≤ Y.
+
+
+
+#### Solution
+
+```python
+def solution(X, Y, D):
+		if not (Y-X) % D: 
+    		return (Y - X) // D
+    else:
+        return (Y - X) // D + 1
+```
 
 
 
@@ -1564,9 +1598,96 @@ def solution(N, M):
 
 ## Lesson 13 Fibonacci numbers
 
+### 1. [Respectable] [FibFrog](https://app.codility.com/programmers/lessons/13-fibonacci_numbers/fib_frog/)
+
+The Fibonacci sequence is defined using the following recursive formula:
+
+```
+    F(0) = 0    F(1) = 1    F(M) = F(M - 1) + F(M - 2) if M >= 2
+```
+
+A small frog wants to get to the other side of a river. The frog is initially located at one bank of the river (position −1) and wants to get to the other bank (position N). The frog can jump over any distance F(K), where F(K) is the K-th Fibonacci number. Luckily, there are many leaves on the river, and the frog can jump between the leaves, but only in the direction of the bank at position N.
+
+The leaves on the river are represented in an array A consisting of N integers. Consecutive elements of array A represent consecutive positions from 0 to N − 1 on the river. Array A contains only 0s and/or 1s:
+
+> - 0 represents a position without a leaf;
+> - 1 represents a position containing a leaf.
+
+The goal is to count the minimum number of jumps in which the frog can get to the other side of the river (from position −1 to position N). The frog can jump between positions −1 and N (the banks of the river) and every position containing a leaf.
+
+For example, consider array A such that:
+
+```
+    A[0] = 0    A[1] = 0    A[2] = 0    A[3] = 1    A[4] = 1    A[5] = 0    A[6] = 1    A[7] = 0    A[8] = 0    A[9] = 0    A[10] = 0
+```
+
+The frog can make three jumps of length F(5) = 5, F(3) = 2 and F(5) = 5.
+
+Write a function:
+
+> ```
+> def solution(A)
+> ```
+
+that, given an array A consisting of N integers, returns the minimum number of jumps by which the frog can get to the other side of the river. If the frog cannot reach the other side of the river, the function should return −1.
+
+For example, given:
+
+```
+    A[0] = 0    A[1] = 0    A[2] = 0    A[3] = 1    A[4] = 1    A[5] = 0    A[6] = 1    A[7] = 0    A[8] = 0    A[9] = 0    A[10] = 0
+```
+
+the function should return 3, as explained above.
+
+Write an ***\*efficient\**** algorithm for the following assumptions:
+
+> - N is an integer within the range [0..100,000];
+> - each element of array A is an integer that can have one of the following values: 0, 1.
+
+#### Solution
+
+> https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=alwlren_00&logNo=221627071567
+
+```python
+def solution(A):
+    A.append(1)
+    N = len(A)
+    fib = [0] * 27
+    fib[1] = 1
+    for i in range(2, 27):
+        fib[i] = fib[i-1] + fib[i-2]
+        if fib[i] > N: 
+            fib = fib[2:i]
+            break
+    
+    reachable = [-1]*N
+    for jump in fib:
+        if A[jump-1] == 1: reachable[jump-1] = 1
+    
+    for i in range(N):
+        if A[i] == 1 and reachable[i] < 0:
+            min = N + 1
+            minidx = -1
+            for jump in fib:
+                pre = i - jump
+                if pre < 0 or reachable[pre] <0:
+                    continue
+                if min > reachable[pre]:
+                    min = reachable[pre]
+                    minidx = pre
+            if minidx != -1:
+                reachable[i] = min +1
+    
+    return reachable[-1]
+```
 
 
-## Lesson 14
+
+## Lesson 14 Binary Search Algorithm
+
+### 1. [Respectable] [MinMaxDivision](https://app.codility.com/programmers/lessons/14-binary_search_algorithm/min_max_division/)
+
+
 
 
 
@@ -1858,7 +1979,7 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 #### Solution
 
-​```python
+```python
 
 ```
 
@@ -1871,3 +1992,7 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 
 
 
+
+```
+
+```
