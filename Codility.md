@@ -1923,7 +1923,25 @@ Write an ***\*efficient\**** algorithm for the following assumptions:
 #### Solution
 
 ```python
+def solution(A, B):
+    N = len(A)
+    if N == 0: return 0
+    if N == 1: return 1
+    LINE = []
+    for i in range(N):
+        LINE.append([A[i], B[i]])
 
+    LINE.sort(key=lambda x: (x[1], x[0]))
+
+    end_point = LINE[0][1]
+    cnt = 1
+    
+    for i in range(1, N):
+        if end_point < LINE[i][0]:
+            end_point = LINE[i][1]
+            cnt += 1
+    
+    return cnt
 ```
 
 
